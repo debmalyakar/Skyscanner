@@ -9,9 +9,14 @@ import SwiftUI
 
 @main
 struct SkyscannerApp: App {
+    let coordinator = AppCoordinator()
+    init () {
+        SkyTabBarAppearance.apply()
+    }
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppCoordinatorView(coordinator: coordinator)
         }
     }
 }
