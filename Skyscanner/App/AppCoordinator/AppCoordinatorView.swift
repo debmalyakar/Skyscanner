@@ -52,7 +52,7 @@ extension AppCoordinatorView {
     }
     
     @ViewBuilder func getPlacesView(tabItem : TabItem) -> some View {
-        CoordinatorView(coordinator: coordinator.conditionsCoordinator).tag(tabItem)
+        CoordinatorView(coordinator: coordinator.placesCoordinator).tag(tabItem)
     }
     
     @ViewBuilder func getTodayView(tabItem : TabItem) -> some View {
@@ -62,5 +62,5 @@ extension AppCoordinatorView {
 }
 
 #Preview {
-    AppCoordinatorView(coordinator: AppCoordinator())
+    AppCoordinatorView(coordinator: AppCoordinator(appDependencyContainer: AppDependencyContainer()))
 }

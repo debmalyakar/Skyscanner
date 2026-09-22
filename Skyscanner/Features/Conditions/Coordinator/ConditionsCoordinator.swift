@@ -16,7 +16,14 @@ enum ConditionsRoute : Hashable  , Equatable{
 class ConditionsCoordinator : Coordinator {
   
     typealias Route = ConditionsRoute
-    var navigationController: NavigationController = NavigationController()
+    var navigationController: NavigationController
+    
+    var appDependencyContainer : AppDependencyContainer
+
+    init(navigationController: NavigationController = NavigationController(), appDependencyContainer: AppDependencyContainer) {
+        self.navigationController = navigationController
+        self.appDependencyContainer = appDependencyContainer
+    }
     
     @ViewBuilder
     func getView(for route : Route) -> some View {

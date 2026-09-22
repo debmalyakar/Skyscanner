@@ -38,8 +38,16 @@ enum TabItem: Hashable {
 @Observable
 class AppCoordinator {
     
-    let conditionsCoordinator : ConditionsCoordinator = ConditionsCoordinator()
-    let placesCoordinator : PlacesCoordinator = PlacesCoordinator()
+    let conditionsCoordinator : ConditionsCoordinator
+    let placesCoordinator : PlacesCoordinator
+    
+    var appDependencyContainer : AppDependencyContainer
+    
+    init (appDependencyContainer : AppDependencyContainer) {
+        self.conditionsCoordinator = ConditionsCoordinator(appDependencyContainer: appDependencyContainer)
+        self.placesCoordinator = PlacesCoordinator(appDependencyContainer: appDependencyContainer)
+        self.appDependencyContainer = appDependencyContainer
+    }
     
     var tabBarItems : [TabItem] = [.today , .forecast , .conditions , .places]
     var selectedTab : TabItem = .today

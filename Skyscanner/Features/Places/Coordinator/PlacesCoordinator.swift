@@ -15,14 +15,21 @@ enum PlacesRoute : Hashable , Equatable {
 @Observable
 class PlacesCoordinator : Coordinator {
     
+    var appDependencyContainer : AppDependencyContainer
+    
+    init(appDependencyContainer: AppDependencyContainer, navigationController: NavigationController = NavigationController()) {
+        self.appDependencyContainer = appDependencyContainer
+        self.navigationController = navigationController
+    }
+    
     typealias Route = PlacesRoute
     
-    var navigationController : NavigationController = NavigationController()
+    var navigationController : NavigationController
     @ViewBuilder
     func getView(for route : Route) -> some View {
         switch route {
         case .places:
-             EmptyView()
+            appDependencyContainer.getPlacesView()
         }
     }
     @ViewBuilder

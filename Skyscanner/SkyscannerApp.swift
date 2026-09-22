@@ -9,8 +9,12 @@ import SwiftUI
 
 @main
 struct SkyscannerApp: App {
-    let coordinator = AppCoordinator()
+    let appDependencyContainer : AppDependencyContainer
+    let coordinator : AppCoordinator
     init () {
+        let appDependencyContainer = AppDependencyContainer()
+        self.appDependencyContainer = appDependencyContainer
+        self.coordinator = AppCoordinator(appDependencyContainer: appDependencyContainer)
         SkyTabBarAppearance.apply()
     }
     
