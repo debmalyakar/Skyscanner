@@ -40,9 +40,7 @@ struct SearchBar: View {
         .frame(height: 48)
         .background(Capsule().fill(Color.white.opacity(0.10)))
         .overlay(Capsule().strokeBorder(Color.white.opacity(0.16), lineWidth: 1))
-        .background(content: {
-            Color.midnight
-        })
+        
     }
 }
 

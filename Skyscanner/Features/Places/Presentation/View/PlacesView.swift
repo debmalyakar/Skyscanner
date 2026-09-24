@@ -15,8 +15,15 @@ struct PlacesView: View {
             VStack {
                 PlacesHeader(heading: "Places")
                 SearchBar(query: $viewModel.query)
+                   
+                PlacesSearchResultView(searchBarState: viewModel.searchState, query: viewModel.trimmedQuery)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                
             }
             .padding(AppPadding.padding8)
+            .task(id : viewModel.query) {
+                await viewModel.fetchGeocodingResponse(query: viewModel.query)
+            }
 
             
         }

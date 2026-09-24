@@ -16,7 +16,8 @@ enum NetworkError: Error, Equatable {
 
 protocol ApiClient {
     associatedtype T : Decodable
-    func getResponse(from urlComponent : URLComponents , urlSession : URLSessionProtocol) async throws -> T
+    var urlSession : URLSessionProtocol {get set}
+    func getResponse(from urlComponent : URLComponents ) async throws -> T
     @concurrent func decode(data : Data) async throws -> T
 }
 
@@ -31,7 +32,7 @@ extension URLSession: URLSessionProtocol { }
 /// Generics networking layer
 extension ApiClient where T : Decodable{
     
-    func getResponse(from urlComponent : URLComponents , urlSession : URLSessionProtocol = URLSession.shared) async throws -> T {
+    func getResponse(from urlComponent : URLComponents) async throws -> T {
         guard let url = urlComponent.url else {
             throw NetworkError.invalidURL
         }
