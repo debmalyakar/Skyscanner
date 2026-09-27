@@ -12,6 +12,8 @@ enum NetworkError: Error, Equatable {
     case invalidURL
     case badResponse
     case decodingError
+    case emptyData
+    case parseError
 }
 
 protocol ApiClient {
@@ -42,8 +44,15 @@ extension ApiClient where T : Decodable{
               (200...299).contains(httpResponse.statusCode) else {
             throw NetworkError.badResponse
         }
-        let _response : T = try await decode(data: data)
-       return _response
+        guard !data.isEmpty else{
+            throw NetworkError.emptyData
+        }
+        do {
+            let _response : T = try await decode(data: data)
+            return _response
+        }catch {
+            throw NetworkError.parseError
+        }
     }
  
     @concurrent func decode(data : Data) async throws -> T {
