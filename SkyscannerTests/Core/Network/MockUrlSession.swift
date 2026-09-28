@@ -64,5 +64,20 @@ class DummyApiClient : ApiClient {
     init(urlSession: URLSessionProtocol) {
         self.urlSession = urlSession
     }
-
+    
+//    func getResponse(from urlComponent : URLComponents) async throws -> T {
+//        guard let url = urlComponent.url else {
+//            throw NetworkError.invalidURL
+//        }
+//        let (data , response) = try await urlSession.data(from: url)
+//        // Validate HTTP response status
+//        guard let httpResponse = response as? HTTPURLResponse,
+//              (200...299).contains(httpResponse.statusCode) else {
+//            throw NetworkError.badResponse
+//        }
+//        let _response : T = try await decode(data: data)
+//       return _response
+//    }
+    
+    
 }

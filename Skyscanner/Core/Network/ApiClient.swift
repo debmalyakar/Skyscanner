@@ -16,7 +16,7 @@ enum NetworkError: Error, Equatable {
     case parseError
 }
 
-protocol ApiClient {
+protocol ApiClient<T>{
     associatedtype T : Decodable
     var urlSession : URLSessionProtocol {get set}
     func getResponse(from urlComponent : URLComponents ) async throws -> T

@@ -7,10 +7,6 @@
 
 import Foundation
 
-protocol GeocodingFetch {
-    func getGeocodingResult(name : String) async throws -> [GeocodingResultDTO]
-}
-
 protocol GeocodingFetchRemoteDataSource {
     func fetchGeocodingResults(query : String , count : Int) async throws -> [GeocodingResultDTO]
 }
@@ -18,8 +14,8 @@ protocol GeocodingFetchRemoteDataSource {
 
 class GeocodingFetchRemoteDataSourceImpl : GeocodingFetchRemoteDataSource {
     
-    var apiClient : GeocodingAPIClient
-    init(apiClient: GeocodingAPIClient) {
+    var apiClient : any ApiClient<GeocodingResponseDTO>
+    init(apiClient: any ApiClient<GeocodingResponseDTO>) {
         self.apiClient = apiClient
     }
     
@@ -28,12 +24,21 @@ class GeocodingFetchRemoteDataSourceImpl : GeocodingFetchRemoteDataSource {
         components.queryItems = [
             .init(name: "name", value: query),
             .init(name: "count", value: String(count)),
-            .init(name: "language", value: Locale.current.language.languageCode?.identifier ?? "en"),
+            .init(name: "language", value:  "en"),
             .init(name: "format", value: "json")
         ]
-
-        let response : GeocodingResponseDTO = try await apiClient.getResponse(from: components)
-        return response.results ?? []
+        do {
+            let response : GeocodingResponseDTO = try await apiClient.getResponse(from: components)
+            return response.results ?? []
+        }catch  let error as NetworkError {
+            if error == .parseError {
+                return []
+            }else {
+                throw error
+            }
+        } catch {
+            throw error
+        }
     }
     
 }
