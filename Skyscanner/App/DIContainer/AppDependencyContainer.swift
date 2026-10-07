@@ -12,7 +12,7 @@ class AppDependencyContainer {
         return PlacesViewModel(geocodingFetchUseCase: getGeoCodingFetchUseCase())
     }
     
-    func getGeoCodingFetchUseCase() -> GeocodingFetchUseCase {
+    func getGeoCodingFetchUseCase() -> some GeocodingFetchUseCaseProtocol {
         
         GeocodingFetchUseCase(goecodingRepo: getGeoCodingRepository())
     }
@@ -21,7 +21,7 @@ class AppDependencyContainer {
         GeocodingFetchRemoteDataSourceImpl(apiClient: getGeoCodingApiClient())
     }
     
-    func getGeoCodingRepository() -> GeocodingRepositoryImpl {
+    func getGeoCodingRepository() -> some GeocodingRepository {
         GeocodingRepositoryImpl(dataSource: getGeoCodingRemoteDataSource())
     }
     

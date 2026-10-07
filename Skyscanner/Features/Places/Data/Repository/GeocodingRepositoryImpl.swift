@@ -8,11 +8,11 @@
 import Foundation
 
 
-class GeocodingRepositoryImpl: GeocodingRepository {
+final class GeocodingRepositoryImpl<RemoteDataSource : GeocodingFetchRemoteDataSource>: GeocodingRepository {
     
-    var dataSource : GeocodingFetchRemoteDataSource
+    var dataSource : RemoteDataSource
     
-    init(dataSource: GeocodingFetchRemoteDataSource) {
+    init(dataSource: RemoteDataSource) {
         self.dataSource = dataSource
     }
     

@@ -12,7 +12,7 @@ protocol GeocodingFetchRemoteDataSource {
 }
 
 
-class GeocodingFetchRemoteDataSourceImpl : GeocodingFetchRemoteDataSource {
+final class GeocodingFetchRemoteDataSourceImpl : GeocodingFetchRemoteDataSource {
     
     var apiClient : any ApiClient<GeocodingResponseDTO>
     init(apiClient: any ApiClient<GeocodingResponseDTO>) {

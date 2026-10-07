@@ -7,9 +7,13 @@
 
 import Foundation
 
-class GeocodingFetchUseCase {
-    var goecodingRepo : GeocodingRepository
-    init(goecodingRepo: GeocodingRepository) {
+protocol GeocodingFetchUseCaseProtocol {
+    func fetchGeocoding(query : String) async throws -> [GeocodingResult]
+}
+
+final class GeocodingFetchUseCase<Repository : GeocodingRepository> : GeocodingFetchUseCaseProtocol {
+    var goecodingRepo : Repository
+    init(goecodingRepo: Repository) {
         self.goecodingRepo = goecodingRepo
     }
     func fetchGeocoding(query : String) async throws -> [GeocodingResult] {

@@ -21,9 +21,9 @@ class PlacesViewModel {
     
     var query: String = ""
     
-    var geocodingFetchUseCase : GeocodingFetchUseCase
+    var geocodingFetchUseCase : any GeocodingFetchUseCaseProtocol
     
-    init(geocodingFetchUseCase: GeocodingFetchUseCase) {
+    init(geocodingFetchUseCase: any GeocodingFetchUseCaseProtocol) {
         self.geocodingFetchUseCase = geocodingFetchUseCase
     }
     
