@@ -8,7 +8,7 @@
 import Foundation
 import SwiftUI
 
-enum SearchState {
+enum SearchState : Equatable {
     case idle
     case loading
     case results([GeocodingResult])
@@ -21,10 +21,14 @@ class PlacesViewModel {
     
     var query: String = ""
     
-    var geocodingFetchUseCase : any GeocodingFetchUseCaseProtocol
+    var geocodingFetchUseCase : GeocodingFetchUseCase
     
-    init(geocodingFetchUseCase: any GeocodingFetchUseCaseProtocol) {
+    var debounceMilliSeconds : UInt64
+    
+    init(geocodingFetchUseCase: GeocodingFetchUseCase,
+         debounceMilliSeconds : UInt64 = 300_000_000) {
         self.geocodingFetchUseCase = geocodingFetchUseCase
+        self.debounceMilliSeconds = debounceMilliSeconds
     }
     
     var trimmedQuery: String { query.trimmingCharacters(in: .whitespacesAndNewlines) }
@@ -32,6 +36,7 @@ class PlacesViewModel {
     var searchState : SearchState = .idle
 
     func fetchGeocodingResponse(query: String , debounce : Bool = true) async  {
+        self.query = query
         let text = trimmedQuery
         guard text.count > 0 else {
             self.searchState = .idle
@@ -41,7 +46,7 @@ class PlacesViewModel {
         
         if case .results = searchState {} else { searchState = .loading }
         if debounce {
-            do { try await Task.sleep(nanoseconds: 300_000_000) } catch { return }
+            do { try await Task.sleep(nanoseconds: debounceMilliSeconds) } catch { return }
         }
 
         if Task.isCancelled { return }
@@ -55,7 +60,7 @@ class PlacesViewModel {
             }
          print(results)
         }catch {
-         self.searchState = .failed(error.localizedDescription)
+         self.searchState = .failed("Failed to Load !")
         }
     }
 }

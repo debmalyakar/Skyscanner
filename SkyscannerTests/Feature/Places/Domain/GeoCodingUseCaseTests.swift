@@ -36,7 +36,7 @@ final class GeoCodingUseCaseTests: XCTestCase {
     func test_query_count_GeoCoding() async throws {
         
         let mockGeoCodingRepo = GeoCodingRepositoryMock(result: .success([]))
-        let sut = GeocodingFetchUseCase(goecodingRepo: mockGeoCodingRepo)
+        let sut = GeocodingFetchUseCaseImplementation(geocodingRepo: mockGeoCodingRepo)
         _ = try await sut.fetchGeocoding(query: "Kolkata")
         
         XCTAssertTrue(mockGeoCodingRepo.queryToCheck == "Kolkata")
@@ -46,7 +46,7 @@ final class GeoCodingUseCaseTests: XCTestCase {
     @MainActor
     func test_check_error_GeoCoding() async throws {
         let mockGeoCodingRepo = GeoCodingRepositoryMock(result: .failure(NetworkError.badResponse))
-        let sut = GeocodingFetchUseCase(goecodingRepo: mockGeoCodingRepo)
+        let sut = GeocodingFetchUseCaseImplementation(geocodingRepo: mockGeoCodingRepo)
         
         do {
             _ = try await sut.fetchGeocoding(query: "Kolkata")
@@ -61,7 +61,7 @@ final class GeoCodingUseCaseTests: XCTestCase {
             GeocodingResult(id: 1, name: "Bangalore", latitude: 23.45, longitude: 43.45, country: "India", admin1: "anyAdmin", timezone: "IST")
         ]
         let mockGeoCodingRepo = GeoCodingRepositoryMock(result: .success(results))
-        let sut = GeocodingFetchUseCase(goecodingRepo: mockGeoCodingRepo)
+        let sut = GeocodingFetchUseCaseImplementation(geocodingRepo: mockGeoCodingRepo)
         let result_Response = try await sut.fetchGeocoding(query: "Kolkata")
         XCTAssertTrue(result_Response.count == 2)
         XCTAssertTrue(results == result_Response)
