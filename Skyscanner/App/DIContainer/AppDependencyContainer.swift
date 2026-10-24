@@ -6,8 +6,18 @@
 //
 
 import Foundation
+import SwiftData
 
 class AppDependencyContainer {
+    
+    let swiftDataManager : SwiftDataManager = SwiftDataManager()
+    
+    var mainContext : ModelContext { swiftDataManager.mainContext }
+    
+    init () {
+        
+    }
+    
     func getPlacesViewModel() -> PlacesViewModel {
         return PlacesViewModel(geocodingFetchUseCase: getGeoCodingFetchUseCase())
     }
