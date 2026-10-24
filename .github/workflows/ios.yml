@@ -55,10 +55,13 @@ jobs:
           echo "Using simulator $DEVICE_ID"
           echo "DEVICE_ID=$DEVICE_ID" >> "$GITHUB_ENV"
 
-      - name: Build and run tests
+      - name: Build and run unit tests
+        # UI tests are skipped in CI: they are slow and flaky on shared runners. Run them locally in Xcode.
         run: |
           xcodebuild test \
             -project "$PROJECT" \
             -scheme "$SCHEME" \
             -destination "id=$DEVICE_ID" \
+            -skip-testing:SkyscannerUITests \
+            -parallel-testing-enabled NO \
             CODE_SIGNING_ALLOWED=NO
