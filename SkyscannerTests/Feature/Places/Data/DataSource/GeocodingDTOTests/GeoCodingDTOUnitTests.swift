@@ -41,12 +41,12 @@ final class GeoCodingDTOUnitTests: XCTestCase {
         let resultsArr = try await sut.fetchGeocodingResults(query: "Lisbon", count: 10)
 //        let result = try await geoCodingApiClient.getResponse(from: URLComponents())
 //        let resultsArr = result.results ?? []
-        XCTAssertEqual(resultsArr.count, 10)
+        XCTAssertEqual(resultsArr.count, 10, "Count mismatch not equal to 10")
         let geoCodingObject = resultsArr[0]
-        XCTAssertEqual(geoCodingObject.name, "Lisbon")
-        XCTAssertEqual(geoCodingObject.country, "Portugal")
-        XCTAssertEqual(geoCodingObject.latitude, 38.72509)
-        XCTAssertEqual(geoCodingObject.longitude, -9.1498)
+        XCTAssertEqual(geoCodingObject.name, "Lisbon" , "Name not equal to Lisbon")
+        XCTAssertEqual(geoCodingObject.country, "Portugal" , "Country mismatched not equal to Portugal")
+        XCTAssertEqual(geoCodingObject.latitude, 38.72509, "Latitude not equal to 38.72509")
+        XCTAssertEqual(geoCodingObject.longitude, -9.1498,"Longitude not equal to -9.1498")
     }
     @MainActor
     func test_Geocoding_Empty_Response() async throws {
