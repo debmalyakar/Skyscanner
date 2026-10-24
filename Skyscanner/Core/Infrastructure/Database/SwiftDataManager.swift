@@ -19,14 +19,31 @@ enum SkyscannerSchema {
     ])
 }
 
-class SwiftDataManager {
-    let modelContainer : ModelContainer
-    let mainContext : ModelContext
-    
-    init() {
-        let storeURL = URL.documentsDirectory.appendingPathComponent("AppDatabase.sqlite")
-        let configuration = ModelConfiguration(schema : SkyscannerSchema.all , url: storeURL , allowsSave: false)
-        self.modelContainer = try! ModelContainer(configurations: configuration)
-        self.mainContext = modelContainer.mainContext
+// MARK: - Manager
+
+@MainActor
+final class SwiftDataManager {
+    let modelContainer: ModelContainer
+    let mainContext: ModelContext
+
+    init(inMemory: Bool = SwiftDataManager.isRunningTests) {
+        let configuration: ModelConfiguration
+        if inMemory {
+            configuration = ModelConfiguration(schema: SkyscannerSchema.all, isStoredInMemoryOnly: true)
+        } else {
+            let storeURL = URL.documentsDirectory.appendingPathComponent("AppDatabase.sqlite")
+            configuration = ModelConfiguration(schema: SkyscannerSchema.all, url: storeURL)
+        }
+
+        do {
+            modelContainer = try ModelContainer(for: SkyscannerSchema.all, configurations: [configuration])
+        } catch {
+            fatalError("Failed to create ModelContainer: \(error)")
+        }
+        mainContext = modelContainer.mainContext
+    }
+
+    nonisolated static var isRunningTests: Bool {
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
 }
