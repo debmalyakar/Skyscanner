@@ -34,7 +34,7 @@ final class GeoCodingDTOUnitTests: XCTestCase {
     }
 @MainActor
     func test_Geocoding_success_Response() async throws {
-        let geoCodingSuccessJSONData = JsonLoader.loadJson(from: "GeocodingSuccessResponse")
+        let geoCodingSuccessJSONData = JsonLoader.loadJson(from: "GeoCodingSuccessResponse")
         let mockUrlSession = MockUrlSession.success(statusCode: 200 , data: geoCodingSuccessJSONData)
         let geoCodingApiClient = GeocodingAPIClient(urlSession: mockUrlSession)
         let sut = GeocodingFetchRemoteDataSourceImpl(apiClient: geoCodingApiClient)
