@@ -1,5 +1,6 @@
-# CI for the Skyscanner iOS app: build and run tests on every push and pull request.
-# Save at: .github/workflows/ci.yml  (and delete the old ios.yml so only one workflow runs)
+# CI for the Skyscanner iOS app WITH SwiftLint: lint, then build and run tests.
+# For later: when ready, replace .github/workflows/ci.yml with this file (rename it to ci.yml)
+# and add .swiftlint.yml to the repo root. Keep only one of the two files in .github/workflows/.
 
 name: CI
 
@@ -17,8 +18,24 @@ env:
   XCODE_VERSION: "26.6"
 
 jobs:
+  lint:
+    name: SwiftLint
+    runs-on: macos-26
+    timeout-minutes: 10
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Install SwiftLint
+        run: brew install swiftlint
+
+      - name: Run SwiftLint
+        continue-on-error: true      # report problems, but don't fail the workflow
+        run: swiftlint lint --reporter github-actions-logging
+
   build-and-test:
     name: Build and test
+    needs: lint
     runs-on: macos-26
     timeout-minutes: 30
     steps:

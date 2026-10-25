@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DFCCB9CC308DE716008598AE /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = DFCCB9CB308DE716008598AE /* .swiftlint.yml */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		DFD8770A305EE49F00F2D463 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +28,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		DFCCB9CB308DE716008598AE /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		DFD876FC305EE49E00F2D463 /* Skyscanner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Skyscanner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFD87709305EE49F00F2D463 /* SkyscannerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkyscannerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		DFD87713305EE49F00F2D463 /* SkyscannerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SkyscannerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -75,6 +80,7 @@
 		DFD876F3305EE49E00F2D463 = {
 			isa = PBXGroup;
 			children = (
+				DFCCB9CB308DE716008598AE /* .swiftlint.yml */,
 				DFD876FE305EE49E00F2D463 /* Skyscanner */,
 				DFD8770C305EE49F00F2D463 /* SkyscannerTests */,
 				DFD87716305EE49F00F2D463 /* SkyscannerUITests */,
@@ -212,6 +218,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DFCCB9CC308DE716008598AE /* .swiftlint.yml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
