@@ -64,8 +64,8 @@ final class PlacesDataSourceTests: XCTestCase {
     @MainActor
     func test_Response_decoding_for_GeoCodingDatasource() async throws {
         let result = [
-            GeocodingResultDTO(id: 1, name: "Kolkata", latitude: 88.34, longitude: 44.34, country: "India", admin1: "", timezone: "IST"),
-            GeocodingResultDTO(id: 1, name: "Bangalore", latitude: 88.34, longitude: 44.34, country: "India", admin1: "", timezone: "IST")
+            GeocodingResultDTO(id: 1, name: "Kolkata", latitude: 22.33, longitude: 88.64, elevation: 2.0, featureCode: "Any", countryCode: "IST", timezone: "IST", population: 1000, country: "India", admin1: "admin1", admin2: "admin2"),
+            GeocodingResultDTO(id: 2, name: "Bangalore", latitude: 23.33, longitude: 89.64, elevation: 3.0, featureCode: "Any", countryCode: "IST", timezone: "IST", population: 2000, country: "India", admin1: "admin1", admin2: "admin2")
         ]
         let sut = GeoCodingMockApiClient(inputResponse: .responseModel(.success(GeocodingResponseDTO(results: result))))
         let geoCodingRemoteDataSource = GeocodingFetchRemoteDataSourceImpl(apiClient: sut)

@@ -36,8 +36,8 @@ final class GeoCodingRepositoryTests: XCTestCase {
     @MainActor
     func test_Success_GeoCoding_Remote_DataSource() async throws {
         let results = [
-            GeocodingResultDTO(id: 1, name: "Kolkata", latitude: 22.33, longitude: 88.64, country: "India", admin1: "anyadmin", timezone: "IST"),
-            GeocodingResultDTO(id: 1, name: "Bangalore", latitude: 23.33, longitude: 89.64, country: "India", admin1: "anyadmin", timezone: "IST")
+            GeocodingResultDTO(id: 1, name: "Kolkata", latitude: 22.33, longitude: 88.64, elevation: 2.0, featureCode: "Any", countryCode: "IST", timezone: "IST", population: 1000, country: "India", admin1: "admin1", admin2: "admin2"),
+            GeocodingResultDTO(id: 2, name: "Bangalore", latitude: 23.33, longitude: 89.64, elevation: 3.0, featureCode: "Any", countryCode: "IST", timezone: "IST", population: 2000, country: "India", admin1: "admin1", admin2: "admin2")
         ]
         let geoCodingRemoteDataSourceMock = GeoCodingRemoteDataSourceMock.success(with: results)
         let sut = GeocodingRepositoryImpl(dataSource: geoCodingRemoteDataSourceMock)
@@ -47,16 +47,18 @@ final class GeoCodingRepositoryTests: XCTestCase {
         XCTAssertEqual(response.first?.latitude, 22.33)
         XCTAssertEqual(response.first?.longitude, 88.64)
         XCTAssertEqual(response.first?.country, "India")
-        XCTAssertEqual(response.first?.admin1, "anyadmin")
-        XCTAssertEqual(response.first?.timezone, "IST")
+        XCTAssertEqual(response.first?.countryCode, "IST")
+        XCTAssertEqual(response.first?.timeZoneID, "IST")
+        XCTAssertEqual(response.first?.elevation, 2.0)
+
         
         XCTAssertEqual(response[1].name, "Bangalore")
         XCTAssertEqual(response[1].latitude, 23.33)
         XCTAssertEqual(response[1].longitude, 89.64)
         XCTAssertEqual(response[1].country, "India")
-        XCTAssertEqual(response[1].admin1, "anyadmin")
-        XCTAssertEqual(response[1].timezone, "IST")
-        
+        XCTAssertEqual(response.first?.countryCode, "IST")
+        XCTAssertEqual(response.first?.timeZoneID, "IST")
+        XCTAssertEqual(response.first?.elevation, 2.0)
     }
     
     @MainActor

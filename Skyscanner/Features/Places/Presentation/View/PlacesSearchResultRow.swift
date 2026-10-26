@@ -14,7 +14,7 @@ struct PlacesSearchResultRow: View {
     var onAdd: () -> Void
 
     private var subtitle: String {
-        [result.admin1.flatMap { $0 == result.name ? nil : $0 }, result.country]
+        [result.region.flatMap { $0 == result.name ? nil : $0 }, result.country]
             .compactMap { $0 }
             .joined(separator: " · ")
     }
@@ -46,6 +46,12 @@ struct PlacesSearchResultRow: View {
     }
 }
 
+extension PlacesSearchResultRow : Equatable {
+    static func == (lhs: PlacesSearchResultRow, rhs: PlacesSearchResultRow) -> Bool {
+        lhs.result == rhs.result && lhs.isSaved == rhs.isSaved
+    }
+}
+
 #Preview {
-    PlacesSearchResultRow(result: GeocodingResult(id: 1, name: "test", latitude: 23.32, longitude: 33.33, country: "India", admin1: "", timezone: ""), isSaved: false, onAdd: {})
+    PlacesSearchResultRow(result: GeocodingResult(id: 1, name: "test", region: "West Bengal", subregion: "Kolkata", country: "India", countryCode: "IN", latitude: 23.32, longitude: 33.33, timeZoneID: "IST", elevation: nil), isSaved: false, onAdd: {})
 }

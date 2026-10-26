@@ -15,27 +15,26 @@ import SwiftData
 final class SavedPlace {
 
     /// Open-Meteo geocoding ID. Unique, so the same city can never be added twice.
+    /// The current-location row uses `SavedPlace.currentLocationID`, since it has no geocoding ID.
     @Attribute(.unique) var id: Int
 
-    // Identity — everything the geocoding result gives us.
+    // Identity, from the geocoding result.
     var name: String                  // "Lisbon"
-    var region: String?               // admin1, e.g. "Lisbon", "Florida"
-    var country: String               // "Portugal"
-    var countryCode: String?          // "PT" — for a flag, if you ever show one
+    var region: String?               // admin1: "Lisbon District", "Florida"
+    var subregion: String?            // admin2: "Lisbon Municipality"
+    var country: String?              // "Portugal", absent for a few places
+    var countryCode: String?          // "PT"
     var latitude: Double
     var longitude: Double
-    var timeZoneID: String            // "Europe/Lisbon" — drives the local clock on the card
-    var elevation: Double?            // metres; Open-Meteo returns it, handy for display
+    var timeZoneID: String            // "Europe/Lisbon", drives the local clock on the card
+    var elevation: Double?            // metres
 
     // User state.
-    var isCurrentLocation: Bool       // the pinned CoreLocation row, always first
-    var sortIndex: Int                // manual ordering in the Places list
+    var isCurrentLocation: Bool
+    var sortIndex: Int
     var addedAt: Date
 
     /// When the forecast request last succeeded for this place.
-    /// This is the single value the freshness rule reads ("older than 20 min → refresh").
-    /// It lives here, not on CurrentWeather, so the check works even before any
-    /// weather has been downloaded, and survives a partially failed refresh.
     var weatherFetchedAt: Date?
 
     // Relationships. Deleting the place deletes all of its weather.
@@ -48,11 +47,14 @@ final class SavedPlace {
     @Relationship(deleteRule: .cascade, inverse: \HourlyForecastEntry.place)
     var hours: [HourlyForecastEntry] = []
 
+    static let currentLocationID = -1
+
     init(
         id: Int,
         name: String,
         region: String? = nil,
-        country: String,
+        subregion: String? = nil,
+        country: String? = nil,
         countryCode: String? = nil,
         latitude: Double,
         longitude: Double,
@@ -65,6 +67,7 @@ final class SavedPlace {
         self.id = id
         self.name = name
         self.region = region
+        self.subregion = subregion
         self.country = country
         self.countryCode = countryCode
         self.latitude = latitude
@@ -83,36 +86,42 @@ extension SavedPlace {
 
     var timeZone: TimeZone { TimeZone(identifier: timeZoneID) ?? .current }
 
-    /// "Lisbon · Portugal" for the card subtitle (the region is dropped when it repeats the name).
+    /// "Lisbon · Portugal". The region is dropped when it just repeats the name,
+    /// which also catches "Lisbon District" for Lisbon and "New York" for New York.
     var subtitle: String {
-        [region.flatMap { $0 == name ? nil : $0 }, country.isEmpty ? nil : country]
-            .compactMap { $0 }
+        let showRegion = region.map { !$0.localizedCaseInsensitiveContains(name) } ?? false
+        return [showRegion ? region : nil, country]
+            .compactMap { $0?.isEmpty == false ? $0 : nil }
             .joined(separator: " · ")
     }
 
-    /// Today's row, in the place's own time zone — the Places card's H/L and the
-    /// Conditions sunrise/sunset come from here.
+    /// Flag emoji from the country code ("PT" → 🇵🇹).
+    var flag: String? {
+        guard let code = countryCode?.uppercased(), code.count == 2 else { return nil }
+        let scalars = code.unicodeScalars.compactMap { UnicodeScalar(127397 + $0.value) }
+        return String(String.UnicodeScalarView(scalars))
+    }
+
     func today(at now: Date = .now) -> DailyForecastEntry? {
         var calendar = Calendar(identifier: .gregorian)
         calendar.timeZone = timeZone
         return days.first { calendar.isDate($0.date, inSameDayAs: now) }
     }
 
-    /// The seven daily rows in order — the Forecast tab's chart and list.
     var sortedDays: [DailyForecastEntry] {
         days.sorted { $0.date < $1.date }
     }
 
-    /// The next N whole hours — the Today tab's hourly strip and the rain alert.
+    /// Includes the hour in progress (at 14:20 the 14:00 slot is "now"),
+    /// so the strip doesn't skip the current hour.
     func upcomingHours(_ count: Int = 24, at now: Date = .now) -> [HourlyForecastEntry] {
-        hours.filter { $0.time > now }
+        let startOfHour = now.addingTimeInterval(-3600)
+        return hours.filter { $0.time > startOfHour }
             .sorted { $0.time < $1.time }
             .prefix(count)
             .map { $0 }
     }
 
-    /// True when the stored forecast is older than `maxAge`, or missing entirely.
-    /// The use case owns the policy; this is just the comparison.
     func isWeatherStale(maxAge: TimeInterval, at now: Date = .now) -> Bool {
         guard let weatherFetchedAt else { return true }
         return now.timeIntervalSince(weatherFetchedAt) >= maxAge

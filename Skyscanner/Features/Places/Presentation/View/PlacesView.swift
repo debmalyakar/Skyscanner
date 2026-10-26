@@ -16,8 +16,11 @@ struct PlacesView: View {
                 PlacesHeader(heading: "Places")
                 SearchBar(query: $viewModel.query)
                    
-                PlacesSearchResultView(searchBarState: viewModel.searchState, query: viewModel.trimmedQuery)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                PlacesSearchResultView(searchBarState: viewModel.searchState, query: viewModel.trimmedQuery, onAdd: { geocodingResult in
+                    viewModel.didSelectPlace(geocodingResult)
+                })
+                .equatable()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 
             }
             .padding(AppPadding.padding8)
@@ -31,5 +34,5 @@ struct PlacesView: View {
 }
 
 #Preview {
-    AppDependencyContainer().getPlacesView()
+    AppDependencyContainer(swiftDataManager: SwiftDataManager()).getPlacesView()
 }

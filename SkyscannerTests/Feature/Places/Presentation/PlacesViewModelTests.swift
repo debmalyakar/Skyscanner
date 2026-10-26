@@ -121,10 +121,10 @@ final class PlacesViewModelTests: XCTestCase {
 }
 
 extension PlacesViewModelTests {
-    func makeSUT(mock : GeocodingFetchUseCase = GeoCodingUseCaseMock() ,debounceMilliSeconds : UInt64) -> PlacesViewModel {
-        let sut = PlacesViewModel(geocodingFetchUseCase: mock, debounceMilliSeconds: debounceMilliSeconds)
+    func makeSUT(mock : GeocodingFetchUseCase = GeoCodingUseCaseMock() ,debounceMilliSeconds : UInt64 , mockPlacesSelectionUseCase : PlacesSelectionUseCase = PlaceSelectionUseCaseMock()) -> PlacesViewModel {
+        let sut = PlacesViewModel(geocodingFetchUseCase: mock, placesSelectionUseCase: mockPlacesSelectionUseCase, debounceMilliSeconds: debounceMilliSeconds)
         return sut
     }
     
-    var sampleResultsGeoCoding : [GeocodingResult] { [GeocodingResult(id: 1, name: "Kolkata", latitude: 88.24, longitude: 33.32, country: "India", admin1: "admin1", timezone: "IST")] }
+    var sampleResultsGeoCoding : [GeocodingResult] { [GeocodingResult(id: 1, name: "Kolkata", region: "West Bengal", subregion: "", country: "India", countryCode: "IST", latitude: 88.24, longitude: 33.32, timeZoneID: "IST", elevation: 20.0)] }
 }

@@ -10,6 +10,7 @@ import SwiftUI
 struct PlacesSearchResultView: View {
     var searchBarState : SearchState
     var query : String
+    var onAdd: (GeocodingResult) -> Void
     var body: some View {
         ZStack {
             Color.ink
@@ -21,8 +22,9 @@ struct PlacesSearchResultView: View {
             case .results(let searchResults) :
                 List(searchResults) { result in
                     PlacesSearchResultRow(result: result, isSaved: false, onAdd: {
-                        
+                        onAdd(result)
                     })
+                    .equatable()
                     .plainRow(horizontal: 5)
                 }
                 .scrollContentBackground(.hidden)
@@ -51,6 +53,14 @@ struct PlacesSearchResultView: View {
     }
 }
 
-#Preview {
-    PlacesSearchResultView(searchBarState: .results([GeocodingResult(id: 1, name: "Kolkata", latitude: 23.44, longitude: 23.33, country: "India", admin1: "", timezone: "IST")]), query: "Kolkata")
+extension PlacesSearchResultView : Equatable {
+    static func == (lhs: PlacesSearchResultView, rhs: PlacesSearchResultView) -> Bool {
+        lhs.searchBarState == rhs.searchBarState && lhs.query == rhs.query
+    }
 }
+    
+
+
+//#Preview {
+//    PlacesSearchResultView(searchBarState: .results([GeocodingResult(id: 1, name: "Kolkata", latitude: 23.44, longitude: 23.33, country: "India", admin1: "", timezone: "IST")]), query: "Kolkata", onAdd: {_ in})
+//}

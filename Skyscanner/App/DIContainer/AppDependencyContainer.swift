@@ -10,16 +10,29 @@ import SwiftData
 
 class AppDependencyContainer {
     
-    let swiftDataManager : SwiftDataManager = SwiftDataManager()
+    let swiftDataManager : SwiftDataManager
     
     var mainContext : ModelContext { swiftDataManager.mainContext }
     
-    init () {
-        
+    let databaseWorkerLazy : BackgroundInitStore<WeatherCacheStore>
+    
+    init (swiftDataManager : SwiftDataManager) {
+        self.swiftDataManager = swiftDataManager
+        self.databaseWorkerLazy = BackgroundInitStore(factory: {
+            WeatherCacheStoreImpl(modelContainer: swiftDataManager.modelContainer)
+        })
+    }
+    
+    func getPlacesSelectionUseCase() -> PlacesSelectionUseCase {
+        PlacesSelectionUseCaseImpl(placesSelectionRepository: getPlaceSelectionRepository())
+    }
+    
+    func getPlaceSelectionRepository() -> some PlaceSelectionRepository {
+        PlaceSelectionRepoImpl()
     }
     
     func getPlacesViewModel() -> PlacesViewModel {
-        return PlacesViewModel(geocodingFetchUseCase: getGeoCodingFetchUseCase())
+        return PlacesViewModel(geocodingFetchUseCase: getGeoCodingFetchUseCase(), placesSelectionUseCase: getPlacesSelectionUseCase())
     }
     
     func getGeoCodingFetchUseCase() -> some GeocodingFetchUseCase {

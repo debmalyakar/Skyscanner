@@ -57,9 +57,10 @@ final class GeoCodingUseCaseTests: XCTestCase {
     @MainActor
     func test_Success_GeoCoding() async throws {
         let results = [
-            GeocodingResult(id: 1, name: "Kolkata", latitude: 23.44, longitude: 43.44, country: "India", admin1: "anyAdmin", timezone: "IST"),
-            GeocodingResult(id: 1, name: "Bangalore", latitude: 23.45, longitude: 43.45, country: "India", admin1: "anyAdmin", timezone: "IST")
+            GeocodingResult(id: 1, name: "Kolkata", region: "West Bengal", subregion: "", country: "India", countryCode: "IND", latitude: 23.44, longitude: 43.44, timeZoneID: "IST", elevation:4.0),
+            GeocodingResult(id: 2, name: "Bangalore", region: "Karnataka", subregion: "", country: "India", countryCode: "IND", latitude: 23.45, longitude: 44.44, timeZoneID: "IST", elevation:34.0),
         ]
+ 
         let mockGeoCodingRepo = GeoCodingRepositoryMock(result: .success(results))
         let sut = GeocodingFetchUseCaseImplementation(geocodingRepo: mockGeoCodingRepo)
         let result_Response = try await sut.fetchGeocoding(query: "Kolkata")

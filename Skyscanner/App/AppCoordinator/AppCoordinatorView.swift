@@ -62,5 +62,5 @@ extension AppCoordinatorView {
 }
 
 #Preview {
-    AppCoordinatorView(coordinator: AppCoordinator(appDependencyContainer: AppDependencyContainer()))
+    AppCoordinatorView(coordinator: AppCoordinator(appDependencyContainer: AppDependencyContainer(swiftDataManager: SwiftDataManager())))
 }

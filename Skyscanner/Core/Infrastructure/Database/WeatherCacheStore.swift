@@ -8,8 +8,13 @@
 import Foundation
 import SwiftData
 
+
+protocol WeatherCacheStore  : Sendable{
+    
+}
+
 @ModelActor
-actor WeatherCacheStore {
+actor WeatherCacheStoreImpl : WeatherCacheStore{
 
    /// Writes one full forecast response for one place: 1 current + 7 daily + 48 hourly.
    func replaceForecast(

@@ -23,11 +23,15 @@ class PlacesViewModel {
     
     var geocodingFetchUseCase : GeocodingFetchUseCase
     
+    var placesSelectionUseCase : PlacesSelectionUseCase
+    
     var debounceMilliSeconds : UInt64
     
     init(geocodingFetchUseCase: GeocodingFetchUseCase,
+         placesSelectionUseCase : PlacesSelectionUseCase,
          debounceMilliSeconds : UInt64 = 300_000_000) {
         self.geocodingFetchUseCase = geocodingFetchUseCase
+        self.placesSelectionUseCase = placesSelectionUseCase
         self.debounceMilliSeconds = debounceMilliSeconds
     }
     
@@ -62,5 +66,9 @@ class PlacesViewModel {
         }catch {
          self.searchState = .failed("Failed to Load !")
         }
+    }
+    
+    func didSelectPlace(_ place: GeocodingResult) {
+        placesSelectionUseCase.savePlaceId(place.id)
     }
 }
