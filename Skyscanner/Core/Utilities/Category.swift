@@ -32,3 +32,10 @@ import SwiftUI
             .listRowInsets(EdgeInsets(top: vertical, leading: horizontal, bottom: vertical, trailing: horizontal))
     }
 }
+// gets safe value from an index in an array
+extension Array {
+    func valueAt(index : Int)->Element? {
+        guard  self.indices.contains(index) else { return nil }
+        return self[index]
+    }
+}

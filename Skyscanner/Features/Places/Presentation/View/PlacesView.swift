@@ -14,10 +14,12 @@ struct PlacesView: View {
             Color.ink.ignoresSafeArea(edges: .all)
             VStack {
                 PlacesHeader(heading: "Places")
-                SearchBar(query: $viewModel.query)
+                SearchBar(query: $viewModel.query, cancel: {
+                    
+                })
                    
                 PlacesSearchResultView(searchBarState: viewModel.searchState, query: viewModel.trimmedQuery, onAdd: { geocodingResult in
-                    viewModel.didSelectPlace(geocodingResult)
+                    viewModel.willSelectPlace(geocodingResult)
                 })
                 .equatable()
                 .frame(maxWidth: .infinity, maxHeight: .infinity)

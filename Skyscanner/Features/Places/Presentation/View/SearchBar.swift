@@ -10,6 +10,7 @@ import SwiftUI
 struct SearchBar: View {
     
     @Binding var query: String
+    var cancel : () -> ()
     
     var body: some View {
         HStack {
@@ -28,6 +29,7 @@ struct SearchBar: View {
             if !query.isEmpty {
                 Button(action : {
                     query = ""
+                    cancel()
                 } , label : {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(Color.white.opacity(0.72))
@@ -46,5 +48,7 @@ struct SearchBar: View {
 
 #Preview {
     @Previewable @State var str: String = ""
-    SearchBar(query: $str)
+    SearchBar(query: $str, cancel: {
+        
+    })
 }

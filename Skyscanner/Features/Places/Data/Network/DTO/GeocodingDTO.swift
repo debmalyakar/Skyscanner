@@ -26,7 +26,6 @@ struct GeocodingResultDTO: Decodable, Identifiable , Equatable {
     let admin1: String?
     let admin2: String?
 }
-// Decode with: decoder.keyDecodingStrategy = .convertFromSnakeCase
 
 extension GeocodingResultDTO {
     func toDomain() -> GeocodingResult {

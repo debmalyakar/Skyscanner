@@ -8,5 +8,6 @@
 import Foundation
 
 protocol PlaceSelectionRepository {
-    func selectPlace(_ placeId: Int)
+    /// Saves the place, marks it as selected, and returns its coordinate for a weather refresh.
+    func selectPlace(_ placeId: Int , geoCodingResult : GeocodingResult) async throws -> PlaceCoordinate
 }

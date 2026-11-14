@@ -80,7 +80,25 @@ final class SavedPlace {
     }
 }
 
-
+extension SavedPlace {
+    // Conversion GeocodingResult to SavedPlace for persistence. The `isCurrentLocation` and `sortIndex` are set to defaults, since they are not part of the geocoding result.
+    convenience init(_ geocodingResult : GeocodingResult) {
+        self.init(id: geocodingResult.id, name: geocodingResult.name, region: geocodingResult.region, subregion: geocodingResult.subregion, country: geocodingResult.country, countryCode: geocodingResult.countryCode, latitude: geocodingResult.latitude, longitude: geocodingResult.longitude, timeZoneID: geocodingResult.timeZoneID, elevation: geocodingResult.elevation, isCurrentLocation: false, sortIndex: 0, addedAt: .now)
+    }
+    // Conversion from SavedPlace to GeocodingResult which is a Domain model
+    func toDomain() -> GeocodingResult {
+        .init(id: id, name: name, region: region, subregion: subregion, country: country, countryCode: countryCode, latitude: latitude, longitude: longitude, timeZoneID: timeZoneID, elevation: elevation)
+    }
+    
+    func toPlaceCoordinate() -> PlaceCoordinate {
+        PlaceCoordinate(
+            id: id,
+            latitude: latitude,
+            longitude: longitude,
+            weatherFetchedAt: weatherFetchedAt
+        )
+    }
+}
 
 extension SavedPlace {
 

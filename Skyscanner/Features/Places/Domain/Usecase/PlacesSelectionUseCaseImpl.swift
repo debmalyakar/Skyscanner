@@ -7,18 +7,19 @@
 
 import Foundation
 protocol PlacesSelectionUseCase {
-    func savePlaceId(_ id : Int)
+    /// Saves the place and returns its coordinate, so the caller can refresh just that place.
+    func savePlace(_ id : Int , geoCodingResult : GeocodingResult) async throws -> PlaceCoordinate
 }
 
-final class PlacesSelectionUseCaseImpl : PlacesSelectionUseCase {
+nonisolated final class PlacesSelectionUseCaseImpl : PlacesSelectionUseCase {
     var placesSelectionRepository : PlaceSelectionRepository
     
     init(placesSelectionRepository: PlaceSelectionRepository) {
         self.placesSelectionRepository = placesSelectionRepository
     }
     
-    func savePlaceId(_ id : Int) {
-        placesSelectionRepository.selectPlace(id)
+    func savePlace(_ id : Int , geoCodingResult : GeocodingResult) async throws -> PlaceCoordinate {
+       try await placesSelectionRepository.selectPlace(id, geoCodingResult: geoCodingResult)
     }
     
 }

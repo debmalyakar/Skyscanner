@@ -118,11 +118,46 @@ final class PlacesViewModelTests: XCTestCase {
         }
     }
 
+    //MARK: - Place selection
+    @MainActor
+    func test_selectPlace_refreshes_only_the_saved_place_coordinate() async {
+        let selectionMock = PlaceSelectionUseCaseMock()
+        let refreshMock = WeatherRefreshUseCaseMock()
+        let sut = makeSUT(debounceMilliSeconds: 0, mockPlacesSelectionUseCase: selectionMock, mockWeatherRefreshUseCase: refreshMock)
+
+        await sut.selectPlace(sampleResultsGeoCoding[0])
+
+        XCTAssertEqual(selectionMock.savedPlaces, [sampleResultsGeoCoding[0]])
+        XCTAssertEqual(sut.selectedPlace, selectionMock.stubbedCoordinate)
+        XCTAssertEqual(refreshMock.refreshedPlaces, [selectionMock.stubbedCoordinate])
+        XCTAssertTrue(refreshMock.refreshAllCalls.isEmpty, "Selecting a place should not refresh every saved place")
+    }
+
+    @MainActor
+    func test_selectPlace_does_not_refresh_when_save_fails() async {
+        let selectionMock = PlaceSelectionUseCaseMock()
+        selectionMock.stubbedError = NetworkError.badResponse
+        let refreshMock = WeatherRefreshUseCaseMock()
+        let sut = makeSUT(debounceMilliSeconds: 0, mockPlacesSelectionUseCase: selectionMock, mockWeatherRefreshUseCase: refreshMock)
+
+        await sut.selectPlace(sampleResultsGeoCoding[0])
+
+        XCTAssertNil(sut.selectedPlace)
+        XCTAssertTrue(refreshMock.refreshedPlaces.isEmpty)
+        XCTAssertTrue(refreshMock.refreshAllCalls.isEmpty)
+    }
+
 }
 
 extension PlacesViewModelTests {
-    func makeSUT(mock : GeocodingFetchUseCase = GeoCodingUseCaseMock() ,debounceMilliSeconds : UInt64 , mockPlacesSelectionUseCase : PlacesSelectionUseCase = PlaceSelectionUseCaseMock()) -> PlacesViewModel {
-        let sut = PlacesViewModel(geocodingFetchUseCase: mock, placesSelectionUseCase: mockPlacesSelectionUseCase, debounceMilliSeconds: debounceMilliSeconds)
+    func makeSUT(mock : GeocodingFetchUseCase = GeoCodingUseCaseMock() ,
+                 debounceMilliSeconds : UInt64 ,
+                 mockPlacesSelectionUseCase : PlacesSelectionUseCase = PlaceSelectionUseCaseMock(),
+                 mockWeatherRefreshUseCase : WeatherRefreshUseCase = WeatherRefreshUseCaseMock()) -> PlacesViewModel {
+        let sut = PlacesViewModel(geocodingFetchUseCase: mock,
+                                  debounceMilliSeconds: debounceMilliSeconds,
+                                  asyncPlacesSelectionUseCaseFactory: { mockPlacesSelectionUseCase },
+                                  asyncRefreshWeatherUseCaseFactory: { mockWeatherRefreshUseCase })
         return sut
     }
     
