@@ -16,6 +16,8 @@ class AppDependencyContainer {
     
     let databaseWorkerLazy : BackgroundInitStore<WeatherCacheStoreImpl>
     
+    private lazy var weatherRefreshUseCase : Task<some WeatherRefreshUseCase, Never> = Task { await getWeatherRefreshUseCase() }
+    
     init (swiftDataManager : SwiftDataManager) {
         self.swiftDataManager = swiftDataManager
         let container = swiftDataManager.modelContainer
@@ -41,7 +43,7 @@ class AppDependencyContainer {
         return PlacesViewModel(geocodingFetchUseCase: getGeoCodingFetchUseCase(), asyncPlacesSelectionUseCaseFactory: { [unowned self] in
             return await getPlacesSelectionUseCase()
         }, asyncRefreshWeatherUseCaseFactory: { [unowned self] in
-            return await getWeatherRefreshUseCase()
+            return  await weatherRefreshUseCase.value
         })
     }
     

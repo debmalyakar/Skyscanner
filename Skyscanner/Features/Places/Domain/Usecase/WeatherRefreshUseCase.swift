@@ -12,45 +12,58 @@ protocol WeatherRefreshUseCase {
     func refresh(_ place: PlaceCoordinate) async throws
 }
 
-final class WeatherRefreshUseCaseImpl : WeatherRefreshUseCase {
-    private let placesRepo : SavedPlaceRepository
+final class WeatherRefreshUseCaseImpl: WeatherRefreshUseCase {
+    private let placesRepo: SavedPlaceRepository
     private let weatherRepo: WeatherRepository
     private let maxAge: TimeInterval
-    private var task : Task<Void , Error>?
-    
+
+    /// The refresh currently running, if any, and whether it covers every place.
+    private var inFlight: (task: Task<Void, Error>, isForced: Bool)?
+
     init(placesRepo: SavedPlaceRepository,
          weatherRepo: WeatherRepository,
-         maxAge: TimeInterval = 10 * 60) {
+         maxAge: TimeInterval = 15 * 60) {
         self.placesRepo = placesRepo
         self.weatherRepo = weatherRepo
         self.maxAge = maxAge
     }
-    
-    
+
     /// Refreshes every saved place whose weather is missing or older than `maxAge`.
     /// `force: true` (pull-to-refresh) refreshes all of them regardless.
-    /// Calls made while a refresh is running join it instead of starting another.
+    /// Calls made while a refresh is running join it when it covers what they asked for.
     func refreshAll(force: Bool = false) async throws {
-        if let task { return try await task.value }
- 
-        let task = Task { [placesRepo, weatherRepo, maxAge] in
-            let all = try await placesRepo.getAllSavedPlaces()
-            let now = Date()
-            let due = force ? all : all.filter { place in
-                guard let fetched = place.weatherFetchedAt else { return true }
-                return now.timeIntervalSince(fetched) >= maxAge
+        if let inFlight {
+            // join only if the running refresh covers this request.
+            if inFlight.isForced || !force {
+                return try await inFlight.task.value
             }
+            // Forced call during a stale-only refresh: let it finish, then go again.
+            _ = try? await inFlight.task.value
+            return try await refreshAll(force: true)
+        }
+
+        let task = Task {
+            // cleared by the task itself, before any waiting caller resumes.
+            defer { self.inFlight = nil }
+            let due = try await duePlaces(force: force)
             try await weatherRepo.fetchWeatherData(for: due)
         }
- 
-        self.task = task
-        defer { self.task = nil }
+        inFlight = (task, force)
         try await task.value
     }
 
     /// Refreshes one place immediately, e.g. right after the user adds it.
-     func refresh(_ place: PlaceCoordinate) async throws {
-         try await weatherRepo.fetchWeatherData(for: [place])
-     }
-    
+    func refresh(_ place: PlaceCoordinate) async throws {
+        try await weatherRepo.fetchWeatherData(for: [place])
+    }
+
+    private func duePlaces(force: Bool) async throws -> [PlaceCoordinate] {
+        let all = try await placesRepo.getAllSavedPlaces()
+        guard !force else { return all }
+        let now = Date()
+        return all.filter { place in
+            guard let fetchedAt = place.weatherFetchedAt else { return true }
+            return now.timeIntervalSince(fetchedAt) >= maxAge
+        }
+    }
 }
