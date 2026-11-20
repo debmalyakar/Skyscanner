@@ -89,7 +89,9 @@ extension SavedPlace {
     func toDomain() -> GeocodingResult {
         .init(id: id, name: name, region: region, subregion: subregion, country: country, countryCode: countryCode, latitude: latitude, longitude: longitude, timeZoneID: timeZoneID, elevation: elevation)
     }
-    
+}
+/// Convert SavedPlace to PlaceCoordinate
+extension SavedPlace {
     func toPlaceCoordinate() -> PlaceCoordinate {
         PlaceCoordinate(
             id: id,
@@ -97,6 +99,23 @@ extension SavedPlace {
             longitude: longitude,
             weatherFetchedAt: weatherFetchedAt
         )
+    }
+}
+
+extension SavedPlace {
+    func toPlaceWeatherSummary(at date : Date = .now) -> PlaceWeatherSummary {
+        let today = today(at: date)
+        return PlaceWeatherSummary(id: id,
+                            name: name,
+                            timeZone: timeZone,
+                            isCurrentLocation: isCurrentLocation,
+                            condition: WeatherCondition(wmoCode: current?.weatherCode ?? 0),
+                            isDay: current?.isDay ?? true,
+                            temparature: current?.temperature,
+                            high: today?.tempMax,
+                            low: today?.tempMin,
+                            sunrise: today?.sunrise,
+                            sunset: today?.sunset)
     }
 }
 

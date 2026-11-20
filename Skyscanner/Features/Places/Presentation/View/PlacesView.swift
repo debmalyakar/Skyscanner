@@ -26,6 +26,9 @@ struct PlacesView: View {
                 
             }
             .padding(AppPadding.padding8)
+            .task {
+                await viewModel.fetchPlacesToShow()
+            }
             .task(id : viewModel.query) {
                 await viewModel.fetchGeocodingResponse(query: viewModel.query)
             }

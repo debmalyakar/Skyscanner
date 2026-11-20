@@ -27,23 +27,37 @@ class PlacesViewModel {
     
     var asyncRefreshWeatherUseCaseFactory : () async -> WeatherRefreshUseCase
     
+    let asyncWeatherSummaryUseCaseFactory : () async -> SavedPlaceSummaryWeatherFetchUseCase
+    
     var debounceMilliSeconds : UInt64
     
     
     init(geocodingFetchUseCase: GeocodingFetchUseCase,
          debounceMilliSeconds : UInt64 = 300_000_000,
          asyncPlacesSelectionUseCaseFactory : @escaping() async -> PlacesSelectionUseCase ,
-         asyncRefreshWeatherUseCaseFactory : @escaping() async -> WeatherRefreshUseCase
+         asyncRefreshWeatherUseCaseFactory : @escaping() async -> WeatherRefreshUseCase,
+         asyncWeatherSummaryUseCaseFactory : @escaping() async -> SavedPlaceSummaryWeatherFetchUseCase
          ) {
         self.geocodingFetchUseCase = geocodingFetchUseCase
         self.debounceMilliSeconds = debounceMilliSeconds
         self.asyncPlacesSelectionUseCaseFactory = asyncPlacesSelectionUseCaseFactory
         self.asyncRefreshWeatherUseCaseFactory = asyncRefreshWeatherUseCaseFactory
+        self.asyncWeatherSummaryUseCaseFactory = asyncWeatherSummaryUseCaseFactory
     }
     
     var trimmedQuery: String { query.trimmingCharacters(in: .whitespacesAndNewlines) }
     
     var searchState : SearchState = .idle
+    
+    func fetchPlacesToShow() async {
+        let weatherSummaryUseCase = await asyncWeatherSummaryUseCaseFactory()
+        do {
+        let weatherSummary = try await weatherSummaryUseCase.fetchAllSavedPlacesWeatherSummary()
+        print(weatherSummary)
+        }catch {
+        print(error)
+        }
+    }
 
     func fetchGeocodingResponse(query: String , debounce : Bool = true) async  {
         self.query = query

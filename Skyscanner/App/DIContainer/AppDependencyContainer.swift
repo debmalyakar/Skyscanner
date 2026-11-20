@@ -44,7 +44,23 @@ class AppDependencyContainer {
             return await getPlacesSelectionUseCase()
         }, asyncRefreshWeatherUseCaseFactory: { [unowned self] in
             return  await weatherRefreshUseCase.value
+        }, asyncWeatherSummaryUseCaseFactory: { [unowned self] in
+            return await getWeatherSummaryUseCase()
         })
+    }
+    
+    func getWeatherSummaryUseCase() async -> some SavedPlaceSummaryWeatherFetchUseCase {
+        let repo = await getWeatherSummaryRepository()
+        return SavedPlaceSummaryWeatherFetchUseCaseImpl(savedPlaceWeatherSummaryRepo: repo)
+    }
+    
+    func getWeatherSummaryRepository() async -> some SavedPlaceWeatherSummaryRepository {
+        let dataSource = await getWeatherSummaryLocalDataSource()
+        return SavedPlaceWeatherSummaryRepositoryImpl(savePlaceWeatherSummaryDataSource: dataSource)
+    }
+    
+    func getWeatherSummaryLocalDataSource()async -> some SavedPlaceWeatherSummaryLocalDataSource {
+        await databaseWorkerLazy.value()
     }
     
     func getWeatherRefreshUseCase() async -> some WeatherRefreshUseCase {

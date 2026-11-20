@@ -19,14 +19,14 @@ final class PlacesViewModelTests: XCTestCase {
     }
     @MainActor
     func test_search_Idle_when_empty_query() async throws {
-        let sut = makeSUT( debounceMilliSeconds: 0)
+        let sut = makeSUT( debounceMilliSeconds: 0, mockWeatheSummaryUseCase: makeWeatherSummaryUseCaseMockWithoutError())
         await sut.fetchGeocodingResponse(query: "")
         XCTAssertEqual(sut.searchState, .idle)
     }
     
     func test_trimming_whitespace_from_query() async throws {
         let mockGeoCodingUseCase = GeoCodingUseCaseMock()
-        let sut = makeSUT(mock: mockGeoCodingUseCase , debounceMilliSeconds: 0)
+        let sut = makeSUT(mock: mockGeoCodingUseCase , debounceMilliSeconds: 0, mockWeatheSummaryUseCase: makeWeatherSummaryUseCaseMockWithoutError())
         let task = Task{ await sut.fetchGeocodingResponse(query: "   Kolkata   " , debounce: false) }
         try await mockGeoCodingUseCase.waitUntilCallStarts()
         mockGeoCodingUseCase.resume(with: .success(sampleResultsGeoCoding))
@@ -36,7 +36,7 @@ final class PlacesViewModelTests: XCTestCase {
     @MainActor
     func test_Loading_State_from_Idle() async throws {
         let mockGeoCodingUseCase = GeoCodingUseCaseMock()
-        let sut = makeSUT(mock: mockGeoCodingUseCase , debounceMilliSeconds: 0)
+        let sut = makeSUT(mock: mockGeoCodingUseCase , debounceMilliSeconds: 0, mockWeatheSummaryUseCase: makeWeatherSummaryUseCaseMockWithoutError())
         let task = Task{ await sut.fetchGeocodingResponse(query: "Kolkata" , debounce: false) }
         try await mockGeoCodingUseCase.waitUntilCallStarts()
         XCTAssertEqual(sut.searchState, .loading)
@@ -46,7 +46,7 @@ final class PlacesViewModelTests: XCTestCase {
     @MainActor
     func test_fetch_setsLoadingState_whenStartingFromFailed() async throws {
         let mockGeoCodingUseCase = GeoCodingUseCaseMock()
-        let sut = makeSUT(mock: mockGeoCodingUseCase , debounceMilliSeconds: 0)
+        let sut = makeSUT(mock: mockGeoCodingUseCase , debounceMilliSeconds: 0, mockWeatheSummaryUseCase: makeWeatherSummaryUseCaseMockWithoutError())
         sut.searchState = .failed("Error text")
         let task = Task{ await sut.fetchGeocodingResponse(query: "Kolkata" , debounce: false) }
         try await mockGeoCodingUseCase.waitUntilCallStarts()
@@ -57,7 +57,7 @@ final class PlacesViewModelTests: XCTestCase {
     @MainActor
     func test_sets_PreviousResult_instead_Of_Loading() async throws {
         let mockGeoCodingUseCase = GeoCodingUseCaseMock()
-        let sut = makeSUT(mock: mockGeoCodingUseCase , debounceMilliSeconds: 0)
+        let sut = makeSUT(mock: mockGeoCodingUseCase , debounceMilliSeconds: 0, mockWeatheSummaryUseCase: makeWeatherSummaryUseCaseMockWithoutError())
         sut.searchState = .results(sampleResultsGeoCoding)
         let task = Task{ await sut.fetchGeocodingResponse(query: "Kolkata" , debounce: false) }
         try await mockGeoCodingUseCase.waitUntilCallStarts()
@@ -70,7 +70,7 @@ final class PlacesViewModelTests: XCTestCase {
     @MainActor
     func test_Success_Path_Where_Search_State_is_Results() async throws {
         let mockGeoCodingUseCase = GeoCodingUseCaseMock()
-        let sut = makeSUT(mock: mockGeoCodingUseCase , debounceMilliSeconds: 0)
+        let sut = makeSUT(mock: mockGeoCodingUseCase , debounceMilliSeconds: 0, mockWeatheSummaryUseCase: makeWeatherSummaryUseCaseMockWithoutError())
         let task = Task{ await sut.fetchGeocodingResponse(query: "Kolkata" , debounce: false) }
         try await mockGeoCodingUseCase.waitUntilCallStarts()
         mockGeoCodingUseCase.resume(with: .success(sampleResultsGeoCoding))
@@ -82,7 +82,7 @@ final class PlacesViewModelTests: XCTestCase {
     @MainActor
     func test_fetch_setsEmptyState_whenUseCaseReturnsNoResults() async throws {
         let mockGeoCodingUseCase = GeoCodingUseCaseMock()
-        let sut = makeSUT(mock: mockGeoCodingUseCase , debounceMilliSeconds: 0)
+        let sut = makeSUT(mock: mockGeoCodingUseCase , debounceMilliSeconds: 0, mockWeatheSummaryUseCase: makeWeatherSummaryUseCaseMockWithoutError())
         let task = Task{ await sut.fetchGeocodingResponse(query: "Kolkata" , debounce: false) }
         try await mockGeoCodingUseCase.waitUntilCallStarts()
         mockGeoCodingUseCase.resume(with: .success([]))
@@ -94,7 +94,7 @@ final class PlacesViewModelTests: XCTestCase {
     @MainActor
     func test_check_Failure_State_When_Fetch_Fails() async throws {
         let mockGeoCodingUseCase = GeoCodingUseCaseMock()
-        let sut = makeSUT(mock: mockGeoCodingUseCase , debounceMilliSeconds: 0)
+        let sut = makeSUT(mock: mockGeoCodingUseCase , debounceMilliSeconds: 0, mockWeatheSummaryUseCase: makeWeatherSummaryUseCaseMockWithoutError())
         let task = Task{ await sut.fetchGeocodingResponse(query: "Kolkata" , debounce: false) }
         try await mockGeoCodingUseCase.waitUntilCallStarts()
         mockGeoCodingUseCase.resume(with: .failure(NetworkError.badResponse))
@@ -123,7 +123,7 @@ final class PlacesViewModelTests: XCTestCase {
     func test_selectPlace_refreshes_only_the_saved_place_coordinate() async {
         let selectionMock = PlaceSelectionUseCaseMock()
         let refreshMock = WeatherRefreshUseCaseMock()
-        let sut = makeSUT(debounceMilliSeconds: 0, mockPlacesSelectionUseCase: selectionMock, mockWeatherRefreshUseCase: refreshMock)
+        let sut = makeSUT(debounceMilliSeconds: 0, mockPlacesSelectionUseCase: selectionMock, mockWeatherRefreshUseCase: refreshMock, mockWeatheSummaryUseCase: makeWeatherSummaryUseCaseMockWithoutError())
 
         await sut.selectPlace(sampleResultsGeoCoding[0])
 
@@ -138,7 +138,7 @@ final class PlacesViewModelTests: XCTestCase {
         let selectionMock = PlaceSelectionUseCaseMock()
         selectionMock.stubbedError = NetworkError.badResponse
         let refreshMock = WeatherRefreshUseCaseMock()
-        let sut = makeSUT(debounceMilliSeconds: 0, mockPlacesSelectionUseCase: selectionMock, mockWeatherRefreshUseCase: refreshMock)
+        let sut = makeSUT(debounceMilliSeconds: 0, mockPlacesSelectionUseCase: selectionMock, mockWeatherRefreshUseCase: refreshMock, mockWeatheSummaryUseCase: makeWeatherSummaryUseCaseMockWithoutError())
 
         await sut.selectPlace(sampleResultsGeoCoding[0])
 
@@ -153,13 +153,28 @@ extension PlacesViewModelTests {
     func makeSUT(mock : GeocodingFetchUseCase = GeoCodingUseCaseMock() ,
                  debounceMilliSeconds : UInt64 ,
                  mockPlacesSelectionUseCase : PlacesSelectionUseCase = PlaceSelectionUseCaseMock(),
-                 mockWeatherRefreshUseCase : WeatherRefreshUseCase = WeatherRefreshUseCaseMock()) -> PlacesViewModel {
+                 mockWeatherRefreshUseCase : WeatherRefreshUseCase = WeatherRefreshUseCaseMock(),
+                 mockWeatheSummaryUseCase : SavedPlaceSummaryWeatherFetchUseCase) -> PlacesViewModel {
         let sut = PlacesViewModel(geocodingFetchUseCase: mock,
                                   debounceMilliSeconds: debounceMilliSeconds,
                                   asyncPlacesSelectionUseCaseFactory: { mockPlacesSelectionUseCase },
-                                  asyncRefreshWeatherUseCaseFactory: { mockWeatherRefreshUseCase })
+                                  asyncRefreshWeatherUseCaseFactory: { mockWeatherRefreshUseCase }, asyncWeatherSummaryUseCaseFactory: { mockWeatheSummaryUseCase })
         return sut
     }
     
+    func makeWeatherSummaryUseCaseMockWithoutError() -> SavedPlaceSummaryWeatherFetchUseCase {
+        WeatherSummaryUseCaseMock(result: .success(samplePlaceWeatherSummary))
+    }
+    
+    func makeWeatherSummaryUseCaseMockWithError() -> SavedPlaceSummaryWeatherFetchUseCase {
+        WeatherSummaryUseCaseMock(result: .failure(NetworkError.invalidURL))
+    }
+    
+    
+    var samplePlaceWeatherSummary : [PlaceWeatherSummary] {
+        []
+    }
+    
     var sampleResultsGeoCoding : [GeocodingResult] { [GeocodingResult(id: 1, name: "Kolkata", region: "West Bengal", subregion: "", country: "India", countryCode: "IST", latitude: 88.24, longitude: 33.32, timeZoneID: "IST", elevation: 20.0)] }
+    
 }
